@@ -17,6 +17,12 @@ app.use(express.urlencoded({extended: true}));
 const router = require('./routes/productRouter');
 app.use('/api/products', router);   
 
+const reviewRouter = require('./routes/reviewRouter');
+app.use('/api/review', reviewRouter);
+
+const tagRouter = require('./routes/tagRouter');
+app.use('/api/tag', tagRouter);
+
 // api
 app.get('/', (req, res) => {
     res.json({

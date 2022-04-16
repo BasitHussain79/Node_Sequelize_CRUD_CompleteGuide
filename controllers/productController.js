@@ -2,6 +2,8 @@ const db = require("../models");
 
 // create main model
 const Product = db.products;
+const Review = db.reviews;
+const Tag = db.tags;
 
 // create product
 const addProduct = async (req, res) => {
@@ -74,6 +76,64 @@ const getPublishedProduct = async (req, res) => {
   res.status(200).send(products);
 };
 
+const getAllProductWithReviews = async (req, res) => {
+  const products = await Product.findAll({include: [{
+    model: Review,
+    as: 'reviews'
+  }]});
+  res.status(200).send(products);
+};
+
+const getAllProductsWithTags = (req, res) => {
+  return Product.findAll({
+    include: [
+      {
+        model: Tag,
+        as: "tags",
+        attributes: ["id", "name"],
+        through: {
+          attributes: [],
+        },
+        // through: {
+        //   attributes: ["tag_id", "tutorial_id"],
+        // },
+      },
+    ],
+  })
+    .then((data) => {
+      return res.status(200).send(data);
+    })
+    .catch((err) => {
+      console.log(">> Error while retrieving Tutorials: ", err);
+    });
+}
+
+const getProductWithTagsById = (req, res) => {
+  const id = req.params.id;
+
+  return Product.findByPk(id, {
+    include: [
+      {
+        model: Tag,
+        as: "tags",
+        attributes: ["id", "name"],
+        through: {
+          attributes: [],
+        },
+        // through: {
+        //   attributes: ["tag_id", "tutorial_id"],
+        // },
+      },
+    ],
+  })
+    .then((data) => {
+      return res.status(200).send(data);
+    })
+    .catch((err) => {
+      console.log(">> Error while finding product: ", err);
+    });
+}
+
 module.exports = {
   addProduct,
   getAllProducts,
@@ -81,4 +141,7 @@ module.exports = {
   getSingleProduct,
   updateProduct,
   deleteProduct,
+  getAllProductWithReviews,
+  getAllProductsWithTags,
+  getProductWithTagsById
 };

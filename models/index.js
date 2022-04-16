@@ -30,10 +30,32 @@ db.sequelize = sequelize;
 
 db.products = require('./productModel.js')(sequelize, DataTypes);
 db.reviews = require('./reviewModel.js')(sequelize, DataTypes);
+db.tags = require('./tags.js')(sequelize, DataTypes);
 
 db.sequelize.sync({force: false})
 .then(() => {
     console.log('Drop and re-sync db.');
 });
 
+// one to many
+db.products.hasMany(db.reviews, {as: 'reviews'});
+db.reviews.belongsTo(db.products, {
+    foreignKey: 'productId',
+    as: 'product'
+})
+
+// many to many
+db.tags.belongsToMany(db.products, {
+    through: 'product_tag',
+    as: 'products',
+    foreignKey: 'tag_id'
+})
+
+db.products.belongsToMany(db.tags, {
+    through: 'product_tag',
+    as: 'tags',
+    foreignKey: 'product_id'
+})
+
 module.exports = db;
+
